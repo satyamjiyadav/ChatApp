@@ -1,5 +1,4 @@
-
-export const baseUrl = import.meta.env.BASE_URL;
+export const baseUrl = import.meta.env.VITE_BASE_URL;
 
 export const postRequest = async (url, body) => {
   try {
