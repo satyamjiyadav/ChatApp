@@ -1,4 +1,5 @@
-export const baseUrl = "http://localhost:5000/api";
+
+export const baseUrl = import.meta.env.BASE_URL;
 
 export const postRequest = async (url, body) => {
   try {
