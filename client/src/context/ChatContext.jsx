@@ -8,7 +8,13 @@ export const ChatContextProvider = ({ children, user }) => {
   const [isUserChatsLoading, setUserChatsLoading] = useState(false);
   const [userChatsError, setUserChatsError] = useState(null);
   const [potentialChats, setPotentialChats] = useState([]);
+  const [currentChat, setCurrentChat] = useState(null);
+  const [messages, setMessages] = useState(null);
+  const [isMessagesLoading, setIsMessagesLoading] = useState(false);
+  const [messagesError, setMessagesError] = useState(null);
 
+  // console.log("currentChat", currentChat);
+  console.log("messages : " , messages);
   useEffect(() => {
     const getUsers = async () => {
       const response = await getRequest(`${baseUrl}/users`);
@@ -37,7 +43,7 @@ export const ChatContextProvider = ({ children, user }) => {
   useEffect(() => {
     const getUserChats = async () => {
       if (user?._id) {
-        console.log("🔄 Fetching chats for user:", user._id);
+        // console.log(" Fetching chats for user:", user._id);
 
         setUserChatsLoading(true);
         setUserChatsError(null);
@@ -46,11 +52,11 @@ export const ChatContextProvider = ({ children, user }) => {
         setUserChatsLoading(false);
 
         if (response.error) {
-          console.log("❌ Error while fetching chats:", response.message);
+          console.log("Error while fetching chats:", response.message);
           return setUserChatsError(response);
         }
 
-        // console.log("✅ Chats fetched:", response);
+        // console.log("Chats fetched:", response);
         setUserChats(response);
       }
     };
@@ -58,19 +64,45 @@ export const ChatContextProvider = ({ children, user }) => {
     getUserChats();
   }, [user]);
 
+  useEffect(() => {
+    const getMessages = async () => {
+      // console.log(" Fetching chats for user:", user._id);
+      if(!currentChat?._id)return;
+      setIsMessagesLoading(true);
+      setMessagesError(null);
+
+      const response = await getRequest(
+        `${baseUrl}/messages/${currentChat._id}`
+      );
+      console.log("Chats fetched:", response);
+
+      setIsMessagesLoading(false);
+
+      if (response.error) {
+        console.log("Error while fetching chats:", response.message);
+        return setMessagesError(response);
+      }
+
+      setMessages(response);
+    };
+
+    getMessages();
+  }, [currentChat]);
+
+  const updateCurrentChat = useCallback((chat) => {
+    setCurrentChat(chat);
+  }, []);
+
   const createChat = useCallback(async (firstId, secondId) => {
-    const response = await postRequest(
-        `${baseUrl}/chats`, 
-        {
-            firstId,
-            secondId,
-        }
-    );
-    if(response.error){
-        return console.log("Error creating chat", response);
+    const response = await postRequest(`${baseUrl}/chats`, {
+      firstId,
+      secondId,
+    });
+    if (response.error) {
+      return console.log("Error creating chat", response);
     }
 
-    setUserChats((prev)=>[...prev,response]);
+    setUserChats((prev) => [...prev, response]);
   }, []);
 
   return (
@@ -81,6 +113,11 @@ export const ChatContextProvider = ({ children, user }) => {
         userChatsError,
         potentialChats,
         createChat,
+        updateCurrentChat,
+        currentChat,
+        messages,
+        isMessagesLoading,
+        messagesError,
       }}
     >
       {children}

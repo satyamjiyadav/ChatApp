@@ -1,5 +1,5 @@
 const messageModel = require("../Models/messageModel");
-
+const mongoose = require("mongoose");
 // createMessage
 const createMessage = async (req, res) => {
   const { chatId, senderId, text } = req.body;
