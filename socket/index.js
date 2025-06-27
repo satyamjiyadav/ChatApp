@@ -1,8 +1,9 @@
+require("dotenv").config();
 const { Server } = require("socket.io");
 
 const io = new Server({
   cors: {
-    origin: process.env.SKT_URL,
+    origin: process.env.SOC_URL,
     methods: ["GET", "POST"],
   },
 });
